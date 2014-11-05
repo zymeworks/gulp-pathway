@@ -27,7 +27,7 @@ function pathway(libPath, options) {
     }
 
     try {
-      file.contents = new Buffer(script(null, {content: file.contents.toString()}, pkg, library).toString());
+      file.contents = new Buffer(script(options, {content: file.contents.toString()}, pkg, library).toString());
       file.path = gutil.replaceExtension(file.path, '.js');
     } catch (er) {
       this.emit('error', new gutil.PluginError('gulp-pathway', err.toString()));

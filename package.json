@@ -20,6 +20,8 @@
   },
   "dependencies": {
     "ejs": "^1.0.0",
+    "escope": "^1.0.1",
+    "esprima": "^1.2.2",
     "gulp-util": "^3.0.1",
     "through2": "^0.6.3"
   }
