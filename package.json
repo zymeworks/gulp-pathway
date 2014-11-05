@@ -1,0 +1,21 @@
+{
+  "name": "gulp-pathway",
+  "version": "1.0.0",
+  "description": "A plugin for Gulp that packages library files into a pathway module structure based upon folder structure",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "gulpplugin",
+    "pathway",
+    "packager"
+  ],
+  "author": "Ruaidhri Devery",
+  "license": "All rights reserved",
+  "devDependencies": {
+    "mocha": "^2.0.1",
+    "should": "^4.1.0",
+    "sinon": "^1.11.1"
+  }
+}
