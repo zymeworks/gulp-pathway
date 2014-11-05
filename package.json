@@ -17,5 +17,10 @@
     "mocha": "^2.0.1",
     "should": "^4.1.0",
     "sinon": "^1.11.1"
+  },
+  "dependencies": {
+    "ejs": "^1.0.0",
+    "gulp-util": "^3.0.1",
+    "through2": "^0.6.3"
   }
 }
