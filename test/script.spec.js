@@ -36,8 +36,8 @@ describe("pathway script render", function () {
 
     it("should catch an error in the syntax", function () {
       should(function () {
-        renderer({}, {content: "$export(a, b, 123);"}, 'a/b/c', 'myLibrary', []);
-      }).throw('invalid export expression');
+        renderer({}, {content: "$export(a, b, 123);", name: "test.js", }, 'a/b/c', 'myLibrary', []);
+      }).throw('Error rendering script (@myLibrary/a/b/c/test.js): Error: invalid export expression');
     });
   });
 });

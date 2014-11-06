@@ -1,5 +1,3 @@
-'use strict';
-
 var through = require('through2');
 var gutil = require('gulp-util');
 
@@ -27,15 +25,24 @@ function pathway(libPath, options) {
     }
 
     try {
-      file.contents = new Buffer(script(options, {content: file.contents.toString()}, pkg, library).toString());
+      file.contents = new Buffer(script(
+        options,
+        {
+          content: file.contents.toString(),
+          path: file.path,
+          name: p.basename(file.path)
+        },
+        pkg,
+        library
+      ).toString());
       file.path = gutil.replaceExtension(file.path, '.js');
     } catch (er) {
-      this.emit('error', new gutil.PluginError('gulp-pathway', err.toString()));
+      this.emit('error', new gutil.PluginError('gulp-pathway', er));
     }
 
     this.push(file);
     callback();
-  })
+  });
 }
 
 module.exports = pathway;
