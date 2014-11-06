@@ -51,12 +51,19 @@ describe('gulp-pathway', function() {
     });
 
     stream.on('data', function(newFile) {
-
       should.exist(newFile);
       should.exist(newFile.contents);
 
-      String(newFile.contents).should.equal(String(expectedFile.contents));
-      done();
+      switch (newFile.path) {
+        case 'test/fixtures/simple/main.js':
+          String(newFile.contents).should.equal(String(expectedFile.contents));
+          break;
+        case 'test/fixtures/simple.js':
+          String(newFile.contents).should.containEql('"main.js"');
+          done();
+          break;
+        default:
+      }
     });
 
     stream.write(srcFile);
@@ -82,12 +89,19 @@ describe('gulp-pathway', function() {
     });
 
     stream.on('data', function(newFile) {
-
       should.exist(newFile);
       should.exist(newFile.contents);
 
-      String(newFile.contents).should.equal(String(expectedNestedFile.contents));
-      done();
+      switch (newFile.path) {
+        case 'test/fixtures/nested/sub/complex.js':
+          String(newFile.contents).should.equal(String(expectedNestedFile.contents));
+          break;
+        case 'test/fixtures/nested.js':
+          String(newFile.contents).should.containEql('"sub/complex.js"');
+          done();
+          break;
+        default:
+      }
     });
 
     stream.write(srcFile);

@@ -4,13 +4,17 @@ var gutil = require('gulp-util');
 var p = require('path');
 
 var script = require('./lib/script');
+var manifest = require('./lib/manifest');
 
 function pathway(libPath, options) {
   var library = p.basename(libPath);
+  var packages = [];
+  var files = [];
 
-  return through.obj(function (file, encoding, callback) {
+  function write(file, encoding, callback) {
+    // is called with each source file
     var pkg = p.dirname(p.relative(libPath, file.path)).split(p.sep).join('/');
-    pkg = pkg === '.' ? null : pkg;
+    pkg = pkg === '.' ? '/' : pkg;
 
     if (file.isNull()) {
       this.push(file);
@@ -40,9 +44,44 @@ function pathway(libPath, options) {
       this.emit('error', new gutil.PluginError('gulp-pathway', er));
     }
 
+    if (packages.indexOf(pkg)) {
+      packages.push(pkg);
+    }
+
+    files.push(p.relative(libPath, file.path));
+
     this.push(file);
+
     callback();
-  });
+  }
+
+  function flush(cb) {
+    var contents;
+    try {
+      contents = manifest(
+        options,
+        files,
+        packages,
+        library
+      ).toString();
+    } catch (er) {
+      this.emit('error', new gutil.PluginError('gulp-pathway', er));
+    }
+
+    // called after source files have been consumed
+    var manifestFile = new gutil.File({  // create a new file
+      base: __dirname,
+      cwd: __dirname,
+      path: p.dirname(libPath) + '/' + library + '.js',
+      contents: new Buffer(contents)
+    });
+
+    this.push(manifestFile);
+
+    cb();
+  }
+
+  return through.obj(write, flush);
 }
 
 module.exports = pathway;
