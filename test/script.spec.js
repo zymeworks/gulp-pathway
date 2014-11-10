@@ -39,5 +39,10 @@ describe("pathway script render", function () {
         renderer({}, {content: "$export(a, b, 123);", name: "test.js", }, 'a/b/c', 'myLibrary', []);
       }).throw('Error rendering script (@myLibrary/a/b/c/test.js): Error: invalid export expression');
     });
+
+    it("should render a supplied template", function() {
+      script = renderer({scriptTemplate: "<%= package %>"}, {content: "$export(a, b, {c: d});"}, 'a/b/c', 'myLibrary', [{path: "a/b/c.js"}]);
+      script.toString().should.eql('a/b/c');
+    });
   });
 });

@@ -34,5 +34,10 @@ describe("pathway manifest render", function () {
     it("should include the list of packages", function() {
       manifest.toString().should.containEql('packages: ["a/b"]');
     });
+
+    it("should render a supplied template", function() {
+      manifest = renderer({manifestTemplate: "<%= packages %>"}, ["a/b/c.js"], ["a/b"], "myLibrary");
+      manifest.toString().should.eql('a/b');
+    });
   });
 });
