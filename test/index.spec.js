@@ -5,7 +5,7 @@ require('mocha');
 
 var fs = require('fs'),
   should = require('should'),
-  path = require('path');
+  p = require('path');
 
 var gutil = require('gulp-util'),
   pathway = require('../');
@@ -54,20 +54,21 @@ describe('gulp-pathway', function() {
       should.exist(newFile);
       should.exist(newFile.contents);
 
-      switch (newFile.path) {
-        case 'test/fixtures/simple/main.js':
+      switch (p.basename(newFile.path)) {
+        case 'main.js':
           String(newFile.contents).should.equal(String(expectedFile.contents));
           break;
-        case 'test/fixtures/simple.js':
+        case 'simple.js':
           String(newFile.contents).should.containEql('"main.js"');
           done();
           break;
         default:
+          done(newFile.path);
       }
     });
 
     stream.write(srcFile);
-    String(path.extname(srcFile.path)).should.equal('.js');
+    String(p.extname(srcFile.path)).should.equal('.js');
 
     stream.end();
   });
@@ -92,20 +93,21 @@ describe('gulp-pathway', function() {
       should.exist(newFile);
       should.exist(newFile.contents);
 
-      switch (newFile.path) {
-        case 'test/fixtures/nested/sub/complex.js':
+      switch (p.basename(newFile.path)) {
+        case 'complex.js':
           String(newFile.contents).should.equal(String(expectedNestedFile.contents));
           break;
-        case 'test/fixtures/nested.js':
+        case 'nested.js':
           String(newFile.contents).should.containEql('"sub/complex.js"');
           done();
           break;
         default:
+          done(newFile.path);
       }
     });
 
     stream.write(srcFile);
-    String(path.extname(srcFile.path)).should.equal('.js');
+    String(p.extname(srcFile.path)).should.equal('.js');
 
     stream.end();
   });

@@ -44,7 +44,7 @@ function pathway(libPath, options) {
       this.emit('error', new gutil.PluginError('gulp-pathway', er));
     }
 
-    if (packages.indexOf(pkg)) {
+    if (packages.indexOf(pkg) === -1) {
       packages.push(pkg);
     }
 
@@ -72,7 +72,7 @@ function pathway(libPath, options) {
     var manifestFile = new gutil.File({  // create a new file
       base: __dirname,
       cwd: __dirname,
-      path: p.dirname(libPath) + '/' + library + '.js',
+      path: p.join(__dirname, library + '.js'),
       contents: new Buffer(contents)
     });
 
