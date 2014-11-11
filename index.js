@@ -7,9 +7,9 @@ var script = require('./lib/script');
 var manifest = require('./lib/manifest');
 
 function pathway(libPath, options) {
-  var library = p.basename(libPath);
-  var packages = [];
-  var files = [];
+  var library = p.basename(libPath),
+      packages = [],
+      files = [];
 
   function write(file, encoding, callback) {
     // is called with each source file
@@ -56,7 +56,8 @@ function pathway(libPath, options) {
   }
 
   function flush(cb) {
-    var contents;
+    var contents,
+        manifestFile;
     try {
       contents = manifest(
         options,
@@ -68,15 +69,18 @@ function pathway(libPath, options) {
       this.emit('error', new gutil.PluginError('gulp-pathway', er));
     }
 
-    // called after source files have been consumed
-    var manifestFile = new gutil.File({  // create a new file
-      base: __dirname,
-      cwd: __dirname,
-      path: p.join(__dirname, library + '.js'),
-      contents: new Buffer(contents)
-    });
+    // if the content isn't empty add the manifest files
+    if (contents) {
+      manifestFile = new gutil.File({  // create a new file
+        base: __dirname,
+        cwd: __dirname,
+        path: p.join(__dirname, library + '.js'),
+        contents: new Buffer(contents),
+        stat: {}
+      });
 
-    this.push(manifestFile);
+      this.push(manifestFile);
+    }
 
     cb();
   }
