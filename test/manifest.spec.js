@@ -36,7 +36,7 @@ describe("pathway manifest render", function () {
     });
 
     it("should render a supplied template", function() {
-      manifest = renderer({manifestTemplate: "<%= packages %>"}, ["a/b/c.js"], ["a/b"], "myLibrary");
+      manifest = renderer({template: "<%= packages %>"}, ["a/b/c.js"], ["a/b"], "myLibrary");
       manifest.toString().should.eql('a/b');
     });
   });

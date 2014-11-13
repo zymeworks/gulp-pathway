@@ -41,7 +41,7 @@ describe("pathway script render", function () {
     });
 
     it("should render a supplied template", function() {
-      script = renderer({scriptTemplate: "<%= package %>"}, {content: "$export(a, b, {c: d});"}, 'a/b/c', 'myLibrary', [{path: "a/b/c.js"}]);
+      script = renderer({template: "<%= package %>"}, {content: "$export(a, b, {c: d});"}, 'a/b/c', 'myLibrary', [{path: "a/b/c.js"}]);
       script.toString().should.eql('a/b/c');
     });
   });
