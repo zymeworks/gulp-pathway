@@ -3,83 +3,117 @@ var gutil = require('gulp-util');
 
 var p = require('path');
 
-var script = require('./lib/script');
-var manifest = require('./lib/manifest');
+var compileScript = require('./lib/script');
+var compileManifest = require('./lib/manifest');
 
-function pathway(libPath, options) {
-  var library = p.basename(libPath),
-      packages = [],
-      files = [];
-
-  function write(file, encoding, callback) {
-    // is called with each source file
-    var pkg = p.dirname(p.relative(libPath, file.path)).split(p.sep).join('/');
-    pkg = pkg === '.' ? '/' : pkg;
-
-    if (file.isNull()) {
-      this.push(file);
-      return callback();
-    }
-
+function script(libs, options) {
+  function write(file, enc, callback) {
     if (file.isStream()) {
       this.emit(
         'error',
-        new gutil.PluginError('gulp-pathway', 'Streaming not supported')
+        new gutil.PluginError('gulp-pathway#script', 'Streaming not supported')
       );
     }
+    // is called with each source file
+    var route = p.relative(file.base, p.dirname(file.path)).split(p.sep),
+        library = libs.indexOf(route[0]) > -1 ? route[0] : null,
+        pkg = route.slice(1).join('/') || '/';
 
-    try {
-      file.contents = new Buffer(script(
-        options,
-        {
-          content: file.contents.toString(),
-          path: file.path,
-          name: p.basename(file.path)
-        },
-        pkg,
-        library
-      ).toString());
-      file.path = gutil.replaceExtension(file.path, '.js');
-    } catch (er) {
-      this.emit('error', new gutil.PluginError('gulp-pathway', er));
+    if (!file.isNull() && library) {
+      try {
+        file.contents = new Buffer(compileScript(
+          options,
+          {
+            content: file.contents.toString(),
+            path: file.path,
+            name: p.basename(file.path)
+          },
+          pkg,
+          library
+        ).toString());
+        file.path = gutil.replaceExtension(file.path, '.js');
+      } catch (er) {
+        this.emit('error', new gutil.PluginError('gulp-pathway', er));
+      }
     }
-
-    if (packages.indexOf(pkg) === -1) {
-      packages.push(pkg);
-    }
-
-    files.push(p.relative(libPath, file.path));
 
     this.push(file);
 
     callback();
   }
+  return through.obj(write);
+}
+
+function manifest(libs_, options) {
+  var libs = libs_.reduce(function (map, lib) {
+    map[lib] = {
+      packages: [],
+      files: [],
+      name: lib
+    };
+    return map;
+  }, {});
+
+  function write(file, encoding, callback) {
+    if (file.isStream()) {
+      this.emit(
+        'error',
+        new gutil.PluginError('gulp-pathway#manifest', 'Streaming not supported')
+      );
+    }
+    // is called with each source file
+    var route = p.relative(file.base, p.dirname(file.path)).split(p.sep),
+        lib = libs.hasOwnProperty(route[0]) ? libs[route[0]] : null,
+        pkg = route.slice(1).join('/') || '/';
+
+
+    if (lib) {
+      if (lib.packages.indexOf(pkg) === -1) {
+        lib.packages.push(pkg);
+      }
+      lib.files.push(p.join.apply(p, route.slice(1).concat([p.basename(file.path)])));
+      lib.base = file.base;
+      lib.pwd = file.pwd;
+    }
+
+    this.push(file);
+
+    return callback();
+  }
+
 
   function flush(cb) {
     var contents,
-        manifestFile;
-    try {
-      contents = manifest(
-        options,
-        files,
-        packages,
-        library
-      ).toString();
-    } catch (er) {
-      this.emit('error', new gutil.PluginError('gulp-pathway', er));
-    }
+        manifestFile,
+        libName,
+        lib;
 
-    // if the content isn't empty add the manifest files
-    if (contents) {
-      manifestFile = new gutil.File({  // create a new file
-        base: __dirname,
-        cwd: __dirname,
-        path: p.join(__dirname, library + '.js'),
-        contents: new Buffer(contents),
-        stat: {}
-      });
+    for (libName in libs) {
+      lib = libs[libName];
+      try {
+        contents = compileManifest(
+          options,
+          lib.files,
+          lib.packages,
+          libName
+        ).toString();
+      } catch (er) {
+        this.emit('error', new gutil.PluginError('gulp-pathway', er));
+        break;
+      }
 
-      this.push(manifestFile);
+      // if the content isn't empty add the manifest files
+      if (contents && lib.files.length) {
+        manifestFile = new gutil.File({  // create a new file
+          base: lib.base,
+          cwd: lib.cwd,
+          path: p.join(lib.base, lib.name + '.js'),
+          contents: new Buffer(contents),
+          stat: {}
+        });
+
+        this.push(manifestFile);
+      }
     }
 
     cb();
@@ -88,4 +122,8 @@ function pathway(libPath, options) {
   return through.obj(write, flush);
 }
 
-module.exports = pathway;
+
+module.exports = {
+  script: script,
+  manifest: manifest
+};
