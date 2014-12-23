@@ -1,6 +1,6 @@
 {
   "name": "gulp-pathway",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Gulp plugin to compile javascript source directories into Pathway modules",
   "main": "index.js",
   "scripts": {
@@ -24,5 +24,12 @@
     "esprima": "^1.2.2",
     "gulp-util": "^3.0.1",
     "through2": "^0.6.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zymeworks/gulp-pathway"
+  },
+    "bugs": {
+    "url": "https://github.com/zymeworks/gulp-pathway/issues"
   }
 }
