@@ -1,7 +1,7 @@
 {
   "name": "gulp-pathway",
   "version": "1.0.0",
-  "description": "A plugin for Gulp that packages library files into a pathway module structure based upon folder structure",
+  "description": "Gulp plugin to compile javascript source directories into Pathway modules",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
