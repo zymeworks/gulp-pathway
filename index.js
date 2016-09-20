@@ -6,7 +6,7 @@ var p = require('path');
 var compileScript = require('./lib/script');
 var compileManifest = require('./lib/manifest');
 
-function script(libs, options) {
+function script(library, base, options) {
   function write(file, enc, callback) {
     if (file.isStream()) {
       this.emit(
@@ -15,11 +15,10 @@ function script(libs, options) {
       );
     }
     // is called with each source file
-    var route = p.relative(file.base, p.dirname(file.path)).split(p.sep),
-        library = libs.indexOf(route[0]) > -1 ? route[0] : null,
-        pkg = route.slice(1).join('/') || '/';
+    var route = p.relative(base, p.dirname(file.path)).split(p.sep),
+        pkg = route.join('/') || '/';
 
-    if (!file.isNull() && library) {
+    if (!file.isNull() && route[0] !== '..') {
       try {
         file.contents = new Buffer(compileScript(
           options,
@@ -44,15 +43,12 @@ function script(libs, options) {
   return through.obj(write);
 }
 
-function manifest(libs_, options) {
-  var libs = libs_.reduce(function (map, lib) {
-    map[lib] = {
-      packages: [],
-      files: [],
-      name: lib
-    };
-    return map;
-  }, {});
+function manifest(library, base, options) {
+  var lib = {
+    packages: [],
+    files: [],
+    name: library
+  };
 
   function write(file, encoding, callback) {
     if (file.isStream()) {
@@ -62,18 +58,17 @@ function manifest(libs_, options) {
       );
     }
     // is called with each source file
-    var route = p.relative(file.base, p.dirname(file.path)).split(p.sep),
-        lib = libs.hasOwnProperty(route[0]) ? libs[route[0]] : null,
-        pkg = route.slice(1).join('/') || '/';
+    var route = p.relative(base, p.dirname(file.path)).split(p.sep),
+        pkg = route.join('/') || '/';
 
-
-    if (lib) {
+    if (lib && route[0] !== '..') {
       if (lib.packages.indexOf(pkg) === -1) {
         lib.packages.push(pkg);
       }
-      lib.files.push(p.join.apply(p, route.slice(1).concat([p.basename(file.path)])));
-      lib.base = file.base;
+      lib.files.push(p.join.apply(p, route.concat([p.basename(file.path)])));
+      lib.base = base;
       lib.pwd = file.pwd;
+      file.path = p.join(base, library, p.relative(base, file.path))
     }
 
     this.push(file);
@@ -84,36 +79,31 @@ function manifest(libs_, options) {
 
   function flush(cb) {
     var contents,
-        manifestFile,
-        libName,
-        lib;
+        manifestFile;
 
-    for (libName in libs) {
-      lib = libs[libName];
-      try {
-        contents = compileManifest(
-          options,
-          lib.files,
-          lib.packages,
-          libName
-        ).toString();
-      } catch (er) {
-        this.emit('error', new gutil.PluginError('gulp-pathway', er));
-        break;
-      }
+    try {
+      contents = compileManifest(
+        options,
+        lib.files,
+        lib.packages,
+        lib.name
+      ).toString();
+    } catch (er) {
+      this.emit('error', new gutil.PluginError('gulp-pathway', er));
+      return
+    }
 
-      // if the content isn't empty add the manifest files
-      if (contents && lib.files.length) {
-        manifestFile = new gutil.File({  // create a new file
-          base: lib.base,
-          cwd: lib.cwd,
-          path: p.join(lib.base, lib.name + '.js'),
-          contents: new Buffer(contents),
-          stat: {}
-        });
+    // if the content isn't empty add the manifest files
+    if (contents && lib.files.length) {
+      manifestFile = new gutil.File({  // create a new file
+        base: lib.base,
+        cwd: lib.cwd,
+        path: p.join(lib.base, lib.name + '.js'),
+        contents: new Buffer(contents),
+        stat: {}
+      });
 
-        this.push(manifestFile);
-      }
+      this.push(manifestFile);
     }
 
     cb();

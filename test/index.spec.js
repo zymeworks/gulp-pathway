@@ -41,7 +41,7 @@ describe('gulp-pathway', function() {
         contents: fs.readFileSync('test/fixtures/simple/main.js')
       });
 
-      var stream = pathway.script(['simple']);
+      var stream = pathway.script('simple', 'test/fixtures/simple/');
 
       stream.on('error', function(err) {
         should.exist(err);
@@ -70,7 +70,7 @@ describe('gulp-pathway', function() {
         contents: fs.readFileSync('test/fixtures/nested/sub/complex.js')
       });
 
-      var stream = pathway.script(['nested']);
+      var stream = pathway.script('nested', 'test/fixtures/nested/');
 
       stream.on('error', function(err) {
         should.exist(err);
@@ -109,7 +109,7 @@ describe('gulp-pathway', function() {
 
     it("should create a simple manifest", function (done) {
 
-      var stream = pathway.manifest(['simple'], {});
+      var stream = pathway.manifest('simple', 'test/fixtures/simple/', {});
 
       stream.on('error', function (er) {
         should.exist(er);
@@ -127,7 +127,7 @@ describe('gulp-pathway', function() {
         should.exist(mFile);
         should.exist(mFile.contents);
 
-        mFile.path.should.equal('test/fixtures/simple.js');
+        mFile.path.should.equal('test/fixtures/simple/simple.js');
         String(mFile.contents).should.containEql('"main.js"');
         String(mFile.contents).should.containEql('"/"');
         done();
@@ -139,7 +139,7 @@ describe('gulp-pathway', function() {
 
     it("should handle a more complex file a simple manifest", function (done) {
 
-      var stream = pathway.manifest(['simple', 'nested'], {});
+      var stream = pathway.manifest('nested', 'test/fixtures/nested/', {});
 
       stream.on('error', function (er) {
         should.exist(er);
@@ -153,20 +153,12 @@ describe('gulp-pathway', function() {
       });
 
       stream.on('end', function () {
-        var mFile1 = files[files.length - 2];
         var mFile2 = files[files.length - 1];
-
-        should.exist(mFile1);
-        should.exist(mFile1.contents);
-
-        mFile1.path.should.equal('test/fixtures/simple.js');
-        String(mFile1.contents).should.containEql('files: ["main.js"]');
-        String(mFile1.contents).should.containEql('packages: ["/"]');
 
         should.exist(mFile2);
         should.exist(mFile2.contents);
 
-        mFile2.path.should.equal('test/fixtures/nested.js');
+        mFile2.path.should.equal('test/fixtures/nested/nested.js');
         String(mFile2.contents).should.containEql('files: ["sub/complex.js"]');
         String(mFile2.contents).should.containEql('packages: ["sub"]');
         done();
@@ -178,7 +170,7 @@ describe('gulp-pathway', function() {
     });
 
     it("should ignore non pathway libraries", function (done) {
-      var stream = pathway.manifest(['simple']);
+      var stream = pathway.manifest('simple', 'test/fixtures/simple/');
 
       var files = [];
 
@@ -191,9 +183,11 @@ describe('gulp-pathway', function() {
         should.exist(mFile);
         should.exist(mFile.contents);
 
-        mFile.path.should.equal('test/fixtures/simple.js');
+        mFile.path.should.equal('test/fixtures/simple/simple.js');
         String(mFile.contents).should.containEql('"main.js"');
         String(mFile.contents).should.containEql('"/"');
+
+        String(files[0].path).should.equal('test/fixtures/simple/simple/main.js')
         done();
       })
 

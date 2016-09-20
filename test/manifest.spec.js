@@ -8,7 +8,7 @@ describe("pathway manifest render", function () {
   describe("rendering", function () {
     var manifest;
     beforeEach(function () {
-      manifest = renderer({mock: "config"}, ["a/b/c.js"], ["a/b"], "myLibrary");
+      manifest = renderer({mock: "config", pathwaySrc: "makePathway"}, ["a/b/c.js"], ["a/b"], "myLibrary");
     });
 
     it("should create a manifest object", function () {
@@ -24,7 +24,7 @@ describe("pathway manifest render", function () {
     });
 
     it("should have compiled the template", function () {
-      manifest.toString().should.containEql('makePathway("myLibrary", window)');
+      manifest.toString().should.containEql('(makePathway)("myLibrary", window)');
     });
 
     it("should include the list of files", function() {
