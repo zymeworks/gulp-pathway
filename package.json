@@ -1,6 +1,6 @@
 {
   "name": "gulp-pathway",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Gulp plugin to compile javascript source directories into Pathway modules",
   "main": "index.js",
   "scripts": {
