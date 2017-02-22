@@ -170,7 +170,7 @@ describe('gulp-pathway', function() {
     });
 
     it("should ignore non pathway libraries", function (done) {
-      var stream = pathway.manifest('simple', 'test/fixtures/simple/');
+      var stream = pathway.manifest('simple', 'test/fixtures/simple/', {filename: 'my_manifest'});
 
       var files = [];
 
@@ -183,7 +183,7 @@ describe('gulp-pathway', function() {
         should.exist(mFile);
         should.exist(mFile.contents);
 
-        mFile.path.should.equal('test/fixtures/simple/simple.js');
+        mFile.path.should.equal('test/fixtures/simple/my_manifest.js');
         String(mFile.contents).should.containEql('"main.js"');
         String(mFile.contents).should.containEql('"/"');
 

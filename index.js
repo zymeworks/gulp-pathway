@@ -15,8 +15,8 @@ function script(library, base, options) {
       );
     }
     // is called with each source file
-    var route = p.relative(base, p.dirname(file.path)).split(p.sep),
-        pkg = route.join('/') || '/';
+    var route = p.relative(base, p.dirname(file.path)).split(p.sep);
+    var pkg = route.join('/') || '/';
 
     if (!file.isNull() && route[0] !== '..') {
       try {
@@ -58,8 +58,8 @@ function manifest(library, base, options) {
       );
     }
     // is called with each source file
-    var route = p.relative(base, p.dirname(file.path)).split(p.sep),
-        pkg = route.join('/') || '/';
+    var route = p.relative(base, p.dirname(file.path)).split(p.sep);
+    var pkg = route.join('/') || '/';
 
     if (lib && route[0] !== '..') {
       if (lib.packages.indexOf(pkg) === -1) {
@@ -68,7 +68,7 @@ function manifest(library, base, options) {
       lib.files.push(p.join.apply(p, route.concat([p.basename(file.path)])));
       lib.base = base;
       lib.pwd = file.pwd;
-      file.path = p.join(base, library, p.relative(base, file.path))
+      file.path = p.join(base, library, p.relative(base, file.path));
     }
 
     this.push(file);
@@ -78,8 +78,8 @@ function manifest(library, base, options) {
 
 
   function flush(cb) {
-    var contents,
-        manifestFile;
+    var contents;
+    var manifestFile;
 
     try {
       contents = compileManifest(
@@ -90,15 +90,16 @@ function manifest(library, base, options) {
       ).toString();
     } catch (er) {
       this.emit('error', new gutil.PluginError('gulp-pathway', er));
-      return
+      return;
     }
 
     // if the content isn't empty add the manifest files
     if (contents && lib.files.length) {
+      var filename = options && typeof options.filename === 'string' ? options.filename : lib.name;
       manifestFile = new gutil.File({  // create a new file
         base: lib.base,
         cwd: lib.cwd,
-        path: p.join(lib.base, lib.name + '.js'),
+        path: p.join(lib.base, filename + '.js'),
         contents: new Buffer(contents),
         stat: {}
       });
