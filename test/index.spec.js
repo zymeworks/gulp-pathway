@@ -17,16 +17,16 @@ describe('gulp-pathway', function() {
   //
 
   var expectedFile = new gutil.File({
-    path: 'test/expected/simple/main.js',
+    path: 'test/fixtures/simple/main.js',
     cwd: 'test/',
-    base: 'test/expected',
+    base: 'test/fixtures/simple/',
     contents: fs.readFileSync('test/expected/simple/main.js')
   });
 
   var expectedNestedFile = new gutil.File({
-    path: 'test/expected/nested/sub/complex.js',
+    path: 'test/fixtures/nested/sub/complex.js',
     cwd: 'test/',
-    base: 'test/expected',
+    base: 'test/fixtures/nested/',
     contents: fs.readFileSync('test/expected/nested/sub/complex.js')
   });
 
@@ -52,6 +52,9 @@ describe('gulp-pathway', function() {
         should.exist(newFile);
         should.exist(newFile.contents);
         String(newFile.contents).should.equal(String(expectedFile.contents));
+        newFile.path.should.equal(expectedFile.path)
+        newFile.cwd.should.equal(expectedFile.cwd)
+        newFile.base.should.equal(expectedFile.base)
         done();
       });
 
@@ -81,6 +84,9 @@ describe('gulp-pathway', function() {
         should.exist(newFile);
         should.exist(newFile.contents);
         String(newFile.contents).should.equal(String(expectedNestedFile.contents));
+        newFile.path.should.equal(expectedNestedFile.path)
+        newFile.cwd.should.equal(expectedNestedFile.cwd)
+        newFile.base.should.equal(expectedNestedFile.base)
         done();
       });
 

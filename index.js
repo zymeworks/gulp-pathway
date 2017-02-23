@@ -31,6 +31,7 @@ function script(library, base, options) {
           library
         ).toString());
         file.path = gutil.replaceExtension(file.path, '.js');
+        file.base = base;
       } catch (er) {
         this.emit('error', new gutil.PluginError('gulp-pathway', er));
       }
