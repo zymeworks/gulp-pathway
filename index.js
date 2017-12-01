@@ -20,7 +20,7 @@ function script(library, base, options) {
 
     if (!file.isNull() && route[0] !== '..') {
       try {
-        file.contents = new Buffer(compileScript(
+        var script = compileScript(
           options,
           {
             content: file.contents.toString(),
@@ -29,11 +29,13 @@ function script(library, base, options) {
           },
           pkg,
           library
-        ).toString());
+        )
+        file.contents = new Buffer(script.rendered);
         file.path = gutil.replaceExtension(file.path, '.js');
         file.base = base;
       } catch (er) {
         this.emit('error', new gutil.PluginError('gulp-pathway', er));
+        return
       }
     }
 

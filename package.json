@@ -19,7 +19,7 @@
     "sinon": "^1.11.1"
   },
   "dependencies": {
-    "ejs": "^1.0.0",
+    "ejs": "2.5.5",
     "escope": "^1.0.1",
     "esprima": "^1.2.2",
     "gulp-util": "^3.0.1",
@@ -29,7 +29,7 @@
     "type": "git",
     "url": "https://github.com/zymeworks/gulp-pathway"
   },
-    "bugs": {
+  "bugs": {
     "url": "https://github.com/zymeworks/gulp-pathway/issues"
   }
 }

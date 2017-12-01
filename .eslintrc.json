@@ -12,14 +12,18 @@
         "linebreak-style": [
             "error",
             "unix"
-        ],
-        "quotes": [
-            "error",
-            "single"
-        ],
-        "semi": [
-            "error",
-            "always"
         ]
+    },
+    "globals": {
+        "jasmine": false,
+        "spyOn": false,
+        "it": false,
+        "console": false,
+        "describe": false,
+        "expect": false,
+        "beforeEach": false,
+        "waits": false,
+        "waitsFor": false,
+        "runs": false
     }
 }
